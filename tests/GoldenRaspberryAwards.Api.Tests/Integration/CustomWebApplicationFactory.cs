@@ -6,6 +6,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace GoldenRaspberryAwards.Api.Tests.Integration;
 
@@ -33,9 +34,12 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
         builder.ConfigureAppConfiguration((context, configBuilder) =>
         {
+            var assemblyLocation = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!;
+            var csvPath = Path.Combine(assemblyLocation, "Integration", "TestMovielist.csv");
+
             configBuilder.AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["Awards:MovieListPath"] = "Integration/TestMovielist.csv"
+                ["Awards:MovieListPath"] = csvPath
             });
         });
 

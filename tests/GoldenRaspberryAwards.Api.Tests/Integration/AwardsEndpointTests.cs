@@ -54,16 +54,30 @@ public class AwardsEndpointTests : IClassFixture<CustomWebApplicationFactory>
         // Assert
         Assert.NotNull(result);
 
-        var min = Assert.Single(result.Min);
-        Assert.Equal("Producer Min", min.Producer);
-        Assert.Equal(1, min.Interval);
-        Assert.Equal(1981, min.PreviousWin);
-        Assert.Equal(1982, min.FollowingWin);
+        // Min: dois produtores com intervalo 1
+        Assert.Equal(2, result.Min.Count());
 
-        var max = Assert.Single(result.Max);
-        Assert.Equal("Producer Max", max.Producer);
-        Assert.Equal(13, max.Interval);
-        Assert.Equal(1983, max.PreviousWin);
-        Assert.Equal(1996, max.FollowingWin);
+        var minProducer3 = result.Min.First(x => x.Producer == "Producer 3");
+        Assert.Equal(1, minProducer3.Interval);
+        Assert.Equal(2018, minProducer3.PreviousWin);
+        Assert.Equal(2019, minProducer3.FollowingWin);
+
+        var minProducer4 = result.Min.First(x => x.Producer == "Producer 4");
+        Assert.Equal(1, minProducer4.Interval);
+        Assert.Equal(2020, minProducer4.PreviousWin);
+        Assert.Equal(2021, minProducer4.FollowingWin);
+
+        // Max: dois produtores com intervalo 99
+        Assert.Equal(2, result.Max.Count());
+
+        var maxProducer1 = result.Max.First(x => x.Producer == "Producer 1");
+        Assert.Equal(99, maxProducer1.Interval);
+        Assert.Equal(1980, maxProducer1.PreviousWin);
+        Assert.Equal(2079, maxProducer1.FollowingWin);
+
+        var maxProducer2 = result.Max.First(x => x.Producer == "Producer 2");
+        Assert.Equal(99, maxProducer2.Interval);
+        Assert.Equal(1980, maxProducer2.PreviousWin);
+        Assert.Equal(2079, maxProducer2.FollowingWin);
     }
 }

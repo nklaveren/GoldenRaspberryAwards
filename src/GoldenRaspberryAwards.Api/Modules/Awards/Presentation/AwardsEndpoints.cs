@@ -19,17 +19,22 @@ public static class AwardsEndpoints
 
     private static async Task<IResult> GetAwardIntervals(AwardsDbContext db)
     {
-        var intervals = await db.ProducerIntervals.ToListAsync();
+        var minInterval = await db.ProducerIntervals.MinAsync(x => (int?)x.Interval);
+        var maxInterval = await db.ProducerIntervals.MaxAsync(x => (int?)x.Interval);
 
-        if (intervals.Count == 0)
+        if (minInterval is null || maxInterval is null)
             return Results.Ok(new AwardIntervalsResult([], []));
 
-        var minInterval = intervals.Min(x => x.Interval);
-        var maxInterval = intervals.Max(x => x.Interval);
+        var minProducers = await db.ProducerIntervals
+            .Where(x => x.Interval == minInterval)
+            .Select(x => ProducerIntervalDto.ToDto(x))
+            .ToListAsync();
 
-        return Results.Ok(new AwardIntervalsResult(
-            Min: intervals.Where(x => x.Interval == minInterval).Select(ProducerIntervalDto.ToDto),
-            Max: intervals.Where(x => x.Interval == maxInterval).Select(ProducerIntervalDto.ToDto)
-        ));
+        var maxProducers = await db.ProducerIntervals
+            .Where(x => x.Interval == maxInterval)
+            .Select(x => ProducerIntervalDto.ToDto(x))
+            .ToListAsync();
+
+        return Results.Ok(new AwardIntervalsResult(minProducers, maxProducers));
     }
 }
